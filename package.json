@@ -1,8 +1,8 @@
 {
-  "name": "rest-client.js",
+  "name": "resst",
   "version": "1.0.0",
   "description": "A simple REST API Client",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src --presets babel-preset-es2015 --out-dir dist"
