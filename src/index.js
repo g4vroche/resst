@@ -25,10 +25,9 @@ function Client(config){
 
         hooks("before", "all", request);
         hooks("before", method, request);
+        addToStack([handle]);
         hooks("after", "all", request);
         hooks("after", method, request);
-        addToStack([handle]);
-
         return callStack(request);
     }
 
