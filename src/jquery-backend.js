@@ -49,7 +49,7 @@ function formatBody(response){
 function parseHeaders(headerSting){
     var headers = {};
     headerSting.split("\r\n").map( function(line) {
-        if(line.trim()!=""){
+        if(line.trim() !== ""){
             line = line.split(":");
             headers[line.shift().trim()] = line.join(":").trim();
         }
