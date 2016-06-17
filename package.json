@@ -1,6 +1,6 @@
 {
   "name": "resst",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A simple REST API Client",
   "main": "src/index.js",
   "scripts": {
