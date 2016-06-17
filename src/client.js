@@ -1,4 +1,4 @@
-
+module.exports = Client;
 
 function Client(config){
 
