@@ -6,25 +6,36 @@ module.exports = Client;
 
 function Client(config) {
 
-    var _config;
+    var _config = {
+        hooks: {
+            before: [],
+            after: []
+        },
+        headers: {
+            accept: 'application/json'
+        }
+    };
+
+    var _request = {
+        headers: {
+            accept: _config.headers.accept
+        }
+    };
 
     init.bind(this)(config);
 
     /**
      * Init client with global properties,
-     * set some default.
      * Dynamically generate RESTFul methods
      */
     function init(config) {
-        _config = config;
-        _config.headers = _config.headers || {};
-        _config.headers.accept = _config.headers.accept || 'application/json';
+        var _this = this;
 
-        var _arr = ["get", "post", "put", "patch", "delete"];
-        for (var _i = 0; _i < _arr.length; _i++) {
-            var method = _arr[_i];
-            createMethod.bind(this)(method);
-        }
+        _config = Object.assign(_config, config);
+
+        ["get", "post", "put", "patch", "delete"].map(function (method) {
+            return createMethod.bind(_this)(method);
+        });
     }
 
     /*
@@ -42,10 +53,10 @@ function Client(config) {
      * or settings from the global configuration
      */
     function initRequest(request, method, uri) {
-        request.method = method;
-        request.uri = _config.host + uri;
-        request.headers = request.headers || {};
-        request.headers.Accept = _config.headers.accept;
+        request = Object.assign({}, _request, request, {
+            method: method,
+            uri: _config.host + uri
+        });
 
         if (request.body) {
             request.headers["Content-Type"] = "application/x-www-form-urlencoded";

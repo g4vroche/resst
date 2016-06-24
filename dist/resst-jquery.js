@@ -4,7 +4,7 @@ var jQuery = require('jquery');
 
 module.exports = {
 
-    "handle": function handle(request, modifier) {
+    "handle": function handle(request, assigner) {
         var params = Object.assign({}, request, {
             type: request.method,
             cache: true,
@@ -15,11 +15,11 @@ module.exports = {
         return new Promise(function (resolve, reject) {
 
             params.success = function (body, status, response) {
-                resolve(modifier(formatResponse(response)));
+                resolve(assigner(formatResponse(response)));
             };
 
             params.error = function (response) {
-                reject(modifier(formatResponse(response)));
+                reject(assigner(formatResponse(response)));
             };
 
             jQuery.ajax(params);
