@@ -2,12 +2,17 @@ module.exports = Client;
 
 function Client(config){
 
-    var _config = config;
-    var _stack = [];
+    var _config;
 
-    init.bind(this)();
+    init.bind(this)(config);
 
-    function init(){
+    /**
+     * Init client with global properties,
+     * set some default.
+     * Dynamically generate RESTFul methods
+     */
+    function init(config){
+        _config = config;
         _config.headers = _config.headers || {};
         _config.headers.accept = _config.headers.accept || 'application/json';
 
@@ -16,56 +21,75 @@ function Client(config){
         }
     }
 
+    /*
+     * RESTFul method creation
+     * In it's own function for variable scope purpose
+     */
     function createMethod(method) {
         this[method] = function() { return send(method.toUpperCase(), ...arguments); };
     }
 
-    function send(method, uri, request = {}) {
-        request = configure(request, method, uri);
-
-        hooks("before", "all", request);
-        hooks("before", method, request);
-        addToStack([handle]);
-        hooks("after", "all", request);
-        hooks("after", method, request);
-        return callStack(request);
-    }
-
-    function handle(request){
-        return _config.backend.handle(request);
-    }
-
-    function configure(request, method, uri){
-        request.method = method;
-        request.uri = _config.host + uri;
-        request.headers = request.headers || {};
-        request.headers.Accept = _config.headers.accept;
+    /**
+     * Init the request object with some default
+     * or settings from the global configuration
+     */
+    function initRequest(request, method, uri){
+        request.method = method
+        request.uri = _config.host + uri
+        request.headers = request.headers || {}
+        request.headers.Accept = _config.headers.accept
 
         if ( request.body ){
-            request.headers["Content-Type"] = "application/x-www-form-urlencoded";
+            request.headers["Content-Type"] = "application/x-www-form-urlencoded"
         }
 
-        return request;
+        return request
     }
 
-    function hooks(state, method){
-        if (_config.hooks && _config.hooks[state] && _config.hooks[state][method]){
-            addToStack(_config.hooks[state][method]);
+    /**
+     * Actual Transaction handler
+     * Build the stack of operations to run
+     */
+    function send(method, uri, request = {}) {
+        var transaction = {
+            request: initRequest(request, method, uri),
+            response: null
         }
+
+        var _stack = [
+            ..._config.hooks.before,
+            handle,
+            ..._config.hooks.after,
+            (transaction) => transaction
+        ]
+
+        return callStack(_stack, transaction)
     }
 
-    function addToStack(operations) {
-        _stack = _stack.concat(...operations);
+    /**
+     * Send the transaction to backend
+     * and bind response to transaction object when done
+     */
+    function handle(transaction, next){
+        return _config.backend.handle(transaction.request, (response) => {
+            transaction.response = response
+            return next()
+        });
     }
 
-    function callStack(request){
+    /**
+     * Execute synchronously the list of operations
+     * (middlewares like function)
+     */
+    function callStack(_stack, transaction){
+
         var next = function(){
             if (_stack.length > 0){
-                var operation = _stack.shift();
-                return operation(request, next);
+                var operation = _stack.shift()
+                return operation(transaction, next)
             }
-        };
+        }
 
-        return next(next);
+        return next(next)
     }
 }
