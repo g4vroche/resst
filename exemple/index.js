@@ -1,5 +1,5 @@
 var Client = require("../src/index.js");
-var backend = require("../src/resst-jquery.js");
+var backend = require("resst-jquery");
 
 
 var client = new Client({
