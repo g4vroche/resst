@@ -2,23 +2,34 @@ module.exports = Client;
 
 function Client(config){
 
-    var _config;
+    var _config = {
+        hooks: {
+            before: [],
+            after: [],
+        },
+        headers: {
+            accept: 'application/json'
+        }
+    }
+
+    var _request = {
+        headers: {
+            accept: _config.headers.accept
+        }
+    }
 
     init.bind(this)(config);
 
     /**
      * Init client with global properties,
-     * set some default.
      * Dynamically generate RESTFul methods
      */
     function init(config){
-        _config = config;
-        _config.headers = _config.headers || {};
-        _config.headers.accept = _config.headers.accept || 'application/json';
+        _config = Object.assign(_config, config);
 
-        for (var method of ["get", "post", "put", "patch", "delete"]) {
-            createMethod.bind(this)(method);
-        }
+        ["get", "post", "put", "patch", "delete"].map( method => 
+            createMethod.bind(this)(method) 
+        )
     }
 
     /*
@@ -26,7 +37,7 @@ function Client(config){
      * In it's own function for variable scope purpose
      */
     function createMethod(method) {
-        this[method] = function() { return send(method.toUpperCase(), ...arguments); };
+        this[method] = function() { return send(method.toUpperCase(), ...arguments) }
     }
 
     /**
@@ -34,12 +45,12 @@ function Client(config){
      * or settings from the global configuration
      */
     function initRequest(request, method, uri){
-        request.method = method
-        request.uri = _config.host + uri
-        request.headers = request.headers || {}
-        request.headers.Accept = _config.headers.accept
+        request = Object.assign({}, _request, request, {
+            method: method,
+            uri: _config.host + uri,
+        })
 
-        if ( request.body ){
+        if (request.body){
             request.headers["Content-Type"] = "application/x-www-form-urlencoded"
         }
 
