@@ -1,5 +1,5 @@
 var Client = require("../src/index.js");
-var backend = require("resst-jquery");
+var backend = require("resst-fetch");
 
 
 var client = new Client({
@@ -7,7 +7,7 @@ var client = new Client({
     "backend": backend,
     "hooks": {
         "before": [accessToken, getCSRFToken],
-        "after": [consoleLog1, consoleLog2]
+        "after": [consoleLog1, getJsonData, consoleLog2]
     }
 });
 
@@ -31,6 +31,27 @@ function accessToken(transaction, next){
     transaction.request.headers["Access-Token"] = "yolo";
     return next();
 }
+
+
+
+function getJsonData(transaction, next){
+  var data;
+  
+  if(transaction.response.body){
+    try{
+      data = JSON.parse(transaction.response.body);
+    } catch(exception) {
+      data = {error: "Could not read response", exception: exception}
+    }
+  } else {
+    data = {error: "Not data returned"}
+  }
+
+  transaction.response.data = data
+
+  return next();
+}
+
 
 function getCSRFToken(transaction, next){
 
