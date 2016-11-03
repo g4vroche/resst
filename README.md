@@ -42,6 +42,9 @@ Structure of the transaction object:
 * request `object`
   * headers `object` (HTTP headers key value pairs)
   * body `string`
+  * method `string` : HTTP method/verb, automatically set by according to the name of the called method
+  * uri `string` Automatically set with the first argument of the called method
+  * credentials `string` (`ommit` (default) | `same-origin` | `include`) according to [fetch specification](https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials). Beware some backend wont' handle those parameters.
 * response `object`
   * headers `object` (HTTP headers key value pairs)
   * status `object`
@@ -82,11 +85,11 @@ function parseJSON(transaction, next) {
   return next();
 }
 
-// Middlewares are passed to the hook property
+// Middlewares are passed to the middlewares property
 const api = new Resst({
     host: 'https://api.exemple.com/v1',
     backend: backend,
-    hooks: {
+    middlewares: {
       before: [
         addCustomHeader,
       ],
@@ -94,6 +97,14 @@ const api = new Resst({
         parseJSON,
       ],
     }
+});
+
+// Exemple of addng middleware after instanciation
+// Here a simple logger
+api.apply('before', function(transaction, next){
+  console.log('Request about to be sent');
+  console.log(transaction.request);
+  return next();
 });
 
 api.get('/answers/42')

@@ -3,7 +3,7 @@ module.exports = Client;
 function Client(config){
 
     var _config = {
-        hooks: {
+        middlewares: {
             before: [],
             after: [],
         },
@@ -25,12 +25,20 @@ function Client(config){
      * Dynamically generate RESTFul methods
      */
     function init(config){
+        // Backward compatibility
+        if (config.hooks) {
+            config.middlewares = config.hooks;
+        }
         _config = Object.assign(_config, config);
 
         ["get", "post", "put", "patch", "delete"].map( method => 
             createMethod.bind(this)(method) 
         )
     }
+
+    this.apply = function(hook, func) {
+        _config.middlewares[hook].push(func);
+    };
 
     /*
      * RESTFul method creation
@@ -68,9 +76,9 @@ function Client(config){
         }
 
         var _stack = [
-            ..._config.hooks.before,
+            ..._config.middlewares.before,
             handle,
-            ..._config.hooks.after,
+            ..._config.middlewares.after,
             (transaction) => transaction
         ]
 
