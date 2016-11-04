@@ -1,6 +1,6 @@
 {
   "name": "resst",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "A simple REST API Client",
   "keywords": [
     "rest", "client", "http", "api", "restful"
