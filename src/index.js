@@ -90,10 +90,15 @@ function Client(config){
      * and bind response to transaction object when done
      */
     function handle(transaction, next){
-        return _config.backend.handle(transaction.request, (response) => {
-            transaction.response = response
-            return next()
-        });
+        return _config.backend.handle(transaction.request)
+            .then (response => {
+                transaction.response = response;
+                return next()
+            })
+            .catch(error => {
+                transaction.response = error;
+                return next()
+            });
     }
 
     /**
