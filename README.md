@@ -37,7 +37,7 @@ So far there are backends for :
 
 Rather than sending a request object and receiving a separated response object, Resst rely on a top level object called `transaction` which contains both request and response. This gives more context and is more consistent with the nature of HTTP.
 
-Structure of the transaction object: 
+Structure of the transaction object:
 
 * request `object`
   * headers `object` (HTTP headers key value pairs)
@@ -57,7 +57,7 @@ Note that Resst doesn't process any body transformation for you (eg. JSON.parse)
 ### middlewares
 
 Resst is very light and unopiniated but brings you the flexibility of middlewares.
-There are two entrypoint for middlewares: 
+There are two entrypoint for middlewares:
 
 * Before sending the request
 * After receiving the response
@@ -71,7 +71,7 @@ A middleware function receives two parameters, `transaction` and the `next` func
 // Alter request
 function addCustomHeader(transaction, next) {
   if (transaction.request.method === 'POST') { // can read current values
-    transaction.headers['X-foo'] = 'bar'; // can alter request
+    transaction.request.headers['X-foo'] = 'bar'; // can alter request
   }
   return next();
 }
@@ -121,4 +121,3 @@ All these methods takes the same arguments (actually under the hood the same met
 
 * uri `string`
 * request `object` _(optional)_ properties will be merged to create the final request object to be passed to middlewares. You can basically override any part of the request.
-
