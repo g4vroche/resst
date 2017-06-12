@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel ./src --presets babel-preset-es2015 --out-dir dist"
+    "build": "babel ./src --presets babel-preset-es2015 --out-dir dist",
     "install": "babel ./src --presets babel-preset-es2015 --out-dir dist"
   },
   "repository": {
