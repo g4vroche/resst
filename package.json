@@ -1,6 +1,6 @@
 {
   "name": "resst",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "A simple REST API Client",
   "keywords": [
     "rest", "client", "http", "api", "restful"
@@ -9,6 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel ./src --presets babel-preset-es2015 --out-dir dist"
+    "install": "babel ./src --presets babel-preset-es2015 --out-dir dist"
   },
   "repository": {
     "type": "git",
